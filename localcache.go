@@ -1,6 +1,6 @@
 package multicache
 
-import "github.com/golang/groupcache"
+import "github.com/friendlyhank/groupcache"
 
 type LocalCache struct{
 	GroupCache *groupcache.Group
