@@ -21,5 +21,6 @@ func (r *LocalCache)Remove(){
 }
 
 func MakeLocalCache(getter Getter)*LocalCache{
-
+	r := &LocalCache{}
+	return r
 }

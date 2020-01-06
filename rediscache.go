@@ -21,5 +21,6 @@ func (r *RedisCache)Remove(){
 }
 
 func MakeRedisCache(getter Getter)*RedisCache{
-
+	r := &RedisCache{}
+	return r
 }
