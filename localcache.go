@@ -1,8 +1,10 @@
 package multicache
 
-import "github.com/golang/groupcache"
+import "github.com/friendlyhank/groupcache"
 
+//LocalCache -
 type LocalCache struct{
+	prefix string
 	GroupCache *groupcache.Group
 	//数据源
 }
@@ -15,10 +17,9 @@ func (r *LocalCache)Get(){
 
 }
 
-func (r *LocalCache)Make(){
-
+func (r *LocalCache)Remove(){
 }
 
-func (r *LocalCache)Remove(){
+func MakeLocalCache(getter Getter)*LocalCache{
 
 }
