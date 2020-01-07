@@ -6,7 +6,12 @@ import "github.com/friendlyhank/groupcache"
 type LocalCache struct{
 	prefix string
 	GroupCache *groupcache.Group
-	//数据源
+	getter     Getter //redis 数据源
+}
+
+type localCacheContxt struct{
+	val  interface{}
+	args []interface{}
 }
 
 func (r *LocalCache)Set(){
@@ -20,7 +25,10 @@ func (r *LocalCache)Get(){
 func (r *LocalCache)Remove(){
 }
 
-func MakeLocalCache(getter Getter)*LocalCache{
+func MakeLocalCache(getter groupcache.Getter)*LocalCache{
+	if getter == nil{
+		panic("localCache nil Getter")
+	}
 	r := &LocalCache{}
 	return r
 }
