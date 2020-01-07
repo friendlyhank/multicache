@@ -3,8 +3,9 @@ package multicache
 import rds "github.com/friendlyhank/goredis"
 
 type RedisCache struct{
+	prefix string
 	RedisSource *rds.RedisSource
-	//数据源
+	getter     Getter //数据源(这里默认DB)
 }
 
 func (r *RedisCache)Set(){
@@ -15,10 +16,11 @@ func (r *RedisCache)Get(){
 
 }
 
-func (r *RedisCache)Make(){
+func (r *RedisCache)Remove(){
 
 }
 
-func (r *RedisCache)Remove(){
-
+func MakeRedisCache(getter Getter)*RedisCache{
+	r := &RedisCache{}
+	return r
 }
