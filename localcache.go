@@ -4,14 +4,8 @@ import "github.com/friendlyhank/groupcache"
 
 //LocalCache -
 type LocalCache struct{
-	prefix string
 	GroupCache *groupcache.Group
 	getter     Getter //redis 数据源
-}
-
-type localCacheContxt struct{
-	val  interface{}
-	args []interface{}
 }
 
 func (r *LocalCache)Set(){

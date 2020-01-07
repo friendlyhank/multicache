@@ -3,7 +3,6 @@ package multicache
 import rds "github.com/friendlyhank/goredis"
 
 type RedisCache struct{
-	prefix string
 	RedisSource *rds.RedisSource
 	getter     Getter //db 数据源
 }
