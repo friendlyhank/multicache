@@ -2,6 +2,7 @@ package multicache
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/friendlyhank/groupcache"
 	"strings"
@@ -42,7 +43,7 @@ func cacheName(prefix string)string{
 }
 
 //key-
-func (r *MultiCache)key(prefix string,args ...interface{})string{
+func key(prefix string,args ...interface{})string{
 	if len(args) == 0{
 		return ""
 	}
@@ -55,8 +56,8 @@ func (r *MultiCache)key(prefix string,args ...interface{})string{
 	return cacheName(prefix) + "-"+ key
 }
 
-//splitkey-
-func splitkey(key string)[]interface{}{
+//getArgsByKey-
+func getArgsByKey(key string)[]interface{}{
 	n := strings.Index(key, "-")
 	if n < cachePrefixLen {
 		return nil
@@ -74,13 +75,26 @@ func splitkey(key string)[]interface{}{
 }
 
 //Set -
-func (r *MultiCache)Set(){}
+func (m *MultiCache)Set(val interface{}, key string) (err error) {
+	return nil
+}
+
+func (m *MultiCache)SetExpired(val interface{}, key string,expired int) (err error) {
+	m.localCache.SetExpired(val,key,expired)
+	m.rdsCache.SetExpired(val,key,expired)
+
+	return nil
+}
 
 //Get-
-func (r *MultiCache)Get(){}
+func (m *MultiCache)Get(ds interface{},args ...interface{})error{
+	//开关
+
+	return nil
+}
 
 //Remove-
-func (r *MultiCache)Remove(){
+func (m *MultiCache)Remove(){
 }
 
 func MakeMultiCache(getter Getter)*MultiCache{
@@ -99,6 +113,16 @@ func MakeMultiCache(getter Getter)*MultiCache{
 
 	//make localcache
 	multiCache.localCache = MakeLocalCache(groupcache.GetterFunc(func(ctx context.Context,key string,dest groupcache.Sink)error{
+
+		args := getArgsByKey(key)
+		var val interface{}
+		if err := multiCache.rdsCache.Get(val,args);err != nil{
+			return err
+		}
+
+		v,_ := json.Marshal(val)
+		dest.SetBytes(v)
+
 		return nil
 	}))
 
