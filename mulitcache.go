@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	rds "github.com/friendlyhank/goredis"
 	"github.com/friendlyhank/groupcache"
 	"strings"
 )
@@ -75,36 +76,42 @@ func getArgsByKey(key string)[]interface{}{
 }
 
 //Set -
-func (m *MultiCache)Set(val interface{}, key string) (err error) {
+func (m *MultiCache)Set(val interface{}, key string) error {
 	return nil
 }
 
-func (m *MultiCache)SetExpired(val interface{}, key string,expired int) (err error) {
-	m.localCache.SetExpired(val,key,expired)
+func (m *MultiCache)SetExpired(val interface{}, key string,expired int) error {
+	m.localCache.Set(val,key)
 	m.rdsCache.SetExpired(val,key,expired)
-
 	return nil
 }
 
 //Get-
-func (m *MultiCache)Get(ds interface{},args ...interface{})error{
+func (m *MultiCache)Get(val interface{},args ...interface{})error{
+	var err error
 	//开关
+	if m.localCache != nil{
+		err = m.localCache.Get(val,args)
+	}else if m.rdsCache != nil{
+		err = m.rdsCache.Get(val,args)
+	}
 
-	return nil
+	return err
 }
 
 //Remove-
 func (m *MultiCache)Remove(){
 }
 
-func MakeMultiCache(getter Getter)*MultiCache{
+func MakeMultiCache(name string,redisexpired,localexpired int,cacheBytes int64,getter Getter)*MultiCache{
 	if getter == nil{
 		panic("multiCache nil Getter")
 	}
 	multiCache := &MultiCache{getter:getter}
 
 	//make rediscache
-	multiCache.rdsCache = MakeRedisCache(GetterFunc(func(ds interface{},args ...interface{})error{
+	multiCache.rdsCache = MakeRedisCache(name,redisexpired,rds.GetRedisDefault(),
+		GetterFunc(func(ds interface{},args ...interface{})error{
 		if err := getter.Get(ds,args);err != nil{
 			return err
 		}
@@ -112,7 +119,8 @@ func MakeMultiCache(getter Getter)*MultiCache{
 	}))
 
 	//make localcache
-	multiCache.localCache = MakeLocalCache(groupcache.GetterFunc(func(ctx context.Context,key string,dest groupcache.Sink)error{
+	multiCache.localCache = MakeLocalCache(name,cacheBytes,int64(localexpired),
+		groupcache.GetterFunc(func(ctx context.Context,key string,dest groupcache.Sink)error{
 
 		args := getArgsByKey(key)
 		var val interface{}

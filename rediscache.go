@@ -45,10 +45,15 @@ func (r *RedisCache)Remove(){
 
 }
 
-func MakeRedisCache(getter Getter)*RedisCache{
+func MakeRedisCache(name string,expired int,source *rds.RedisSource,getter Getter)*RedisCache{
 	if getter == nil{
 		panic("redisCache nil Getter")
 	}
-	r := &RedisCache{getter:getter}
+	r := &RedisCache{
+		prefix:name,
+		getter:getter,
+		RedisSource:source,
+		expired:expired,
+	}
 	return r
 }

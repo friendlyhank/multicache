@@ -24,7 +24,7 @@ func (l *LocalCache)Set(val interface{},key string)error{
 	return nil
 }
 
-//SetExpired-
+//SetExpired- 暂不支持失效
 func (l *LocalCache)SetExpired(val interface{},key string, expired int) error{
 	return nil
 }
@@ -42,10 +42,11 @@ func (l *LocalCache)Get(val interface{}, args ...interface{})error{
 func (l *LocalCache)Remove(){
 }
 
-func MakeLocalCache(getter groupcache.Getter)*LocalCache{
+func MakeLocalCache(name string,cacheBytes int64,expired int64,getter groupcache.Getter)*LocalCache{
 	if getter == nil{
 		panic("localCache nil Getter")
 	}
-	l := &LocalCache{}
+	l := &LocalCache{prefix:name}
+	l.groupCache = groupcache.NewGroupExt(name,cacheBytes,expired,getter)
 	return l
 }
