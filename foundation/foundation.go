@@ -1,7 +1,7 @@
 package foundation
 
 import (
-	"github.com/friendlyhank/goredis"
+	"github.com/friendlyhank/multicache/foundation/goredis"
 	"github.com/friendlyhank/multicache/foundation/db"
 )
 

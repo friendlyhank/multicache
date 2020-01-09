@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	rds "github.com/friendlyhank/goredis"
+	rds "github.com/friendlyhank/multicache/foundation/goredis"
 	"github.com/friendlyhank/groupcache"
 	"strings"
 )

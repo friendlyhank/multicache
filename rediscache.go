@@ -1,6 +1,6 @@
 package multicache
 
-import rds "github.com/friendlyhank/goredis"
+import rds 	"github.com/friendlyhank/multicache/foundation/goredis"
 
 type RedisCache struct{
 	prefix string
