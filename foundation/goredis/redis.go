@@ -11,6 +11,7 @@ import (
 
 	"github.com/astaxie/beego/logs"
 	"github.com/gomodule/redigo/redis"
+	pfc "github.com/niean/goperfcounter"
 )
 
 // RedisSource -
@@ -70,7 +71,7 @@ func InitRedisServer(server, password string, maxIdle int) {
 func Init() {
 	logs.Debug("|foundation|init|rds|Init")
 	//
-	redissource := beego.AppConfig.DefaultString("redis","192.168.85.109:6379,150,123456")
+	redissource := beego.AppConfig.DefaultString("redis","127.0.0.1:6379,150,123456")
 	if rdss := strings.Split(redissource, ","); len(rdss) == 3 {
 		// address,connect,password
 		maxIdle, _ := strconv.Atoi(rdss[1])
@@ -108,6 +109,7 @@ func (rs *RedisSource) Ping() error {
 func (rs *RedisSource) GetConn() redis.Conn {
 	c := rs.dbpool.Get()
 	// 统计redis 连接数
+	pfc.Gauge("redis.activie.count", int64(rs.dbpool.ActiveCount()))
 	return c
 }
 
@@ -115,7 +117,7 @@ func (rs *RedisSource) GetConn() redis.Conn {
 func (rs *RedisSource) CloseConn(conn redis.Conn) (err error) {
 	err = conn.Close()
 	// 统计redis 连接数
-
+	pfc.Gauge("redis.activie.count", int64(rs.dbpool.ActiveCount()))
 	return
 }
 

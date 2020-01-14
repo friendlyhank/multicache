@@ -1,6 +1,8 @@
 package rds
 
-import "testing"
+import (
+	"testing"
+)
 
 func SetInit(){
 	Init()
@@ -78,6 +80,7 @@ func TestGetUint64(t *testing.T){
 	}
 	t.Logf("%v",ttl)
 }
+
 
 
 
