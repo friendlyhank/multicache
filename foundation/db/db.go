@@ -18,7 +18,7 @@ func Init(){
 		err error
 	)
 
-	dbSource := beego.AppConfig.String("dbsource")
+	dbSource := beego.AppConfig.DefaultString("dbsource","root:123456@tcp(127.0.0.1:3306)/sakila?charset=utf8mb4&loc=Local&interpolateParams=true")
 	if mallEngine,err = xorm.NewEngine("mysql",dbSource);err != nil{
 		logs.Error("Engine Init Err:%v", err)
 		panic(err)

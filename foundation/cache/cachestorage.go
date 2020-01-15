@@ -25,7 +25,7 @@ func Init() {
 // getByI64 - 单一的主键查询
 func getByI64(ds interface{}, args ...interface{}) (err error) {
 	var has bool
-	has, err = db.Engine().Id(args[0].(int64)).Get(ds)
+	has, err = db.Engine().ID(args[0].(int64)).Get(ds)
 	if err != nil {
 		ds = nil
 	} else if !has {

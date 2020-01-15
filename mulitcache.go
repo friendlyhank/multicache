@@ -1,11 +1,9 @@
 package multicache
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
 	rds "github.com/friendlyhank/multicache/foundation/goredis"
-	"github.com/friendlyhank/groupcache"
+	"strconv"
 	"strings"
 )
 
@@ -43,8 +41,8 @@ func cacheName(prefix string)string{
 	return fmt.Sprintf("%v%v", cachePrefix, prefix)
 }
 
-//key-
-func key(prefix string,args ...interface{})string{
+//genkey-
+func genkey(prefix string,args ...interface{})string{
 	if len(args) == 0{
 		return ""
 	}
@@ -69,7 +67,8 @@ func getArgsByKey(key string)[]interface{}{
 
 	var args []interface{}
 	for _,s := range splits{
-		args = append(args,s)
+		id,_ := strconv.ParseInt(s, 10, 64)
+		args = append(args,id)
 	}
 
 	return args
@@ -91,9 +90,9 @@ func (m *MultiCache)Get(val interface{},args ...interface{})error{
 	var err error
 	//开关
 	if m.localCache != nil{
-		err = m.localCache.Get(val,args)
+		err = m.localCache.Get(val,args...)
 	}else if m.rdsCache != nil{
-		err = m.rdsCache.Get(val,args)
+		err = m.rdsCache.Get(val,args...)
 	}
 
 	return err
@@ -109,30 +108,11 @@ func MakeMultiCache(name string,redisexpired,localexpired int,cacheBytes int64,g
 	}
 	multiCache := &MultiCache{getter:getter}
 
-	//make rediscache
-	multiCache.rdsCache = MakeRedisCache(name,redisexpired,rds.GetRedisDefault(),
-		GetterFunc(func(ds interface{},args ...interface{})error{
-		if err := getter.Get(ds,args);err != nil{
-			return err
-		}
-		return nil
-	}))
+	//make rediscache 数据库源
+	multiCache.rdsCache = MakeRedisCache(name,redisexpired,rds.GetRedisDefault(), getter)
 
-	//make localcache
-	multiCache.localCache = MakeLocalCache(name,cacheBytes,int64(localexpired),
-		groupcache.GetterFunc(func(ctx context.Context,key string,dest groupcache.Sink)error{
-
-		args := getArgsByKey(key)
-		var val interface{}
-		if err := multiCache.rdsCache.Get(val,args);err != nil{
-			return err
-		}
-
-		v,_ := json.Marshal(val)
-		dest.SetBytes(v)
-
-		return nil
-	}))
+	//make localcache redis源
+	multiCache.localCache = MakeLocalCache(name,cacheBytes,int64(localexpired),GetterFunc(multiCache.rdsCache.Get))
 
 	return multiCache
 }

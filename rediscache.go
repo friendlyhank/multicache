@@ -11,7 +11,7 @@ type RedisCache struct{
 
 //Get-
 func (r *RedisCache)Get(val interface{},args ...interface{})error{
-	key :=key(r.prefix,args)
+	key :=genkey(r.prefix,args...)
 
 	//
 	if _,err:=r.RedisSource.GetJSON(key,val);err == nil{
@@ -55,5 +55,12 @@ func MakeRedisCache(name string,expired int,source *rds.RedisSource,getter Gette
 		RedisSource:source,
 		expired:expired,
 	}
+	r.getter = GetterFunc(func(ds interface{}, args ...interface{})  error{
+		var err error
+		if err  = getter.Get(ds,args...);err != nil{
+			return err
+		}
+		return nil
+	})
 	return r
 }
