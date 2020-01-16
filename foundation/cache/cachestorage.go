@@ -28,7 +28,9 @@ func getByI64(ds interface{}, args ...interface{}) (err error) {
 	has, err = db.Engine().ID(args[0].(int64)).Get(ds)
 	if err != nil {
 		ds = nil
-	} else if !has {
+	}
+
+	if !has {
 		ds = nil
 		err = ErrNotFound
 	}

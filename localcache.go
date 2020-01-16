@@ -14,7 +14,8 @@ type LocalCache struct{
 }
 
 type GetterContext struct{
-	Val interface{}
+	val interface{}
+	args []interface{}
 }
 
 func (l *LocalCache)Set(val interface{},key string)error{
@@ -36,11 +37,7 @@ func (l *LocalCache)SetExpired(val interface{},key string, expired int) error{
 
 func (l *LocalCache)Get(val interface{}, args ...interface{})error{
 	key := genkey(l.prefix,args...)
-
-	var b []byte
-	l.groupCache.Get(nil,key,groupcache.AllocatingByteSliceSink(&b))
-	err := json.Unmarshal(b,val)
-
+	err := l.groupCache.Get(nil, key,groupcache.AllJsonSink(val))
 	return err
 }
 
@@ -58,11 +55,11 @@ func MakeLocalCache(name string,cacheBytes int64,expired int64,getter Getter)*Lo
 	l.groupCache = groupcache.NewGroupExt(name,cacheBytes,expired,
 		groupcache.GetterFunc(func(ctx context.Context,key string,dest groupcache.Sink)error{
 			args := getArgsByKey(key)
-			var getterContext = &GetterContext{}
-			if err :=getter.Get(getterContext,args...);err != nil{
+			getterContext := dest.(*groupcache.JsonSink)
+			if err :=getter.Get(getterContext.Dst,args...);err != nil{
 				return err
 			}
-			b,_ := json.Marshal(getterContext.Val)
+			b,_ := json.Marshal(getterContext.Dst)
 			dest.SetBytes(b)
 			return nil
 	}))
