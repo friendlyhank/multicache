@@ -29,11 +29,9 @@ func getByI64(ds interface{}, args ...interface{}) (err error) {
 	if err != nil {
 		ds = nil
 	}
-
 	if !has {
 		ds = nil
 		err = ErrNotFound
 	}
-
 	return
 }
