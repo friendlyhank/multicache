@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	_ "github.com/friendlyhank/multicache/foundation"
 	"github.com/friendlyhank/multicache/foundation/cache"
 	"github.com/friendlyhank/multicache/foundation/db"
@@ -11,6 +12,17 @@ import (
 
 var actorids []int64
 
+
+func setUp(){
+	fmt.Println("data source init")
+	db.Engine().Table("actor").Cols("actor_id").Find(&actorids)
+}
+
+func TestMain(m *testing.M){
+	setUp()
+	m.Run()
+}
+
 func TestMultiCache(t *testing.T){
 	for{
 		RandomGetActior(t)
@@ -20,13 +32,10 @@ func TestMultiCache(t *testing.T){
 
 //RandomGetActior -
 func RandomGetActior(t *testing.T){
-	if actorids == nil{
-		db.Engine().Table("actor").Cols("actor_id").Find(&actorids)
-	}
 	randId := rand.Intn(len(actorids)-1)
 	actor,err := cache.GetActor(int64(randId))
 	if err != nil{
-		t.Errorf("get actor|Err|%v|",err)
+		fmt.Println("get actor|Err|",err.Error())
 	}
-	t.Logf("|get actor|id|%v|",actor.ActorId)
+	fmt.Println("|get actor|actor|",actor)
 }
