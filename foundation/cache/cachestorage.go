@@ -83,15 +83,19 @@ func Init() {
 		redisexpired,localexpired,
 		cacheBytes,
 		multicache.GetterFunc(getByI64))
-	PaymentCache = multicache.MakeMultiCache("rental",
+	PaymentCache = multicache.MakeMultiCache("payment",
 		redisexpired,localexpired,
 		cacheBytes,
 		multicache.GetterFunc(getByI64))
-	RentalCache = multicache.MakeMultiCache("staff",
+	RentalCache = multicache.MakeMultiCache("rental",
 		redisexpired,localexpired,
 		cacheBytes,
 		multicache.GetterFunc(getByI64))
-	StaffCache = multicache.MakeMultiCache("store",
+	StaffCache = multicache.MakeMultiCache("staff",
+		redisexpired,localexpired,
+		cacheBytes,
+		multicache.GetterFunc(getByI64))
+	StoreCache = multicache.MakeMultiCache("store",
 		redisexpired,localexpired,
 		cacheBytes,
 		multicache.GetterFunc(getByI64))
@@ -103,7 +107,7 @@ func getByI64(ds interface{}, args ...interface{}) (err error) {
 	has, err = db.Engine().ID(args[0].(int64)).Get(ds)
 	if err != nil {
 		ds = nil
-	}else !has{
+	}else if !has{
 		ds = nil
 		err = ErrNotFound
 	}
