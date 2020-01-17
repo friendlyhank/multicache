@@ -5,6 +5,7 @@ import (
 	rds "github.com/friendlyhank/multicache/foundation/goredis"
 	"strconv"
 	"strings"
+	"sync/atomic"
 )
 
 
@@ -12,6 +13,34 @@ const (
 	cachePrefix    = "__cache_"
 	cachePrefixLen = len(cachePrefix)
 )
+
+// An AtomicInt is an int64 to be accessed atomically.
+type AtomicInt int64
+
+// Add atomically adds n to i.
+func (i *AtomicInt) Add(n int64) {
+	atomic.AddInt64((*int64)(i), n)
+}
+
+// Get atomically gets the value of i.
+func (i *AtomicInt) Get() int64 {
+	return atomic.LoadInt64((*int64)(i))
+}
+
+func (i *AtomicInt) String() string {
+	return strconv.FormatInt(i.Get(), 10)
+}
+
+// Stats are per-group statistics.
+type Stats struct {
+	Gets           AtomicInt //请求数
+	CacheHits      AtomicInt //本地缓存
+	RedisLoads     AtomicInt //远端缓存
+	RedisLoadErrs AtomicInt  //远端错误
+	LocalLoads     AtomicInt //Db请求
+	LocalLoadErrs  AtomicInt //Db错误
+	ServerRequests AtomicInt //网络请求次数
+}
 
 //MultiCache- 二层缓存
 // 第一层: 基于GroupCache的分布式客户端缓存

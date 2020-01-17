@@ -3,6 +3,7 @@ package multicache
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/friendlyhank/groupcache"
 )
 
@@ -38,6 +39,14 @@ func (l *LocalCache)SetExpired(val interface{},key string, expired int) error{
 func (l *LocalCache)Get(val interface{}, args ...interface{})error{
 	key := genkey(l.prefix,args...)
 	err := l.groupCache.Get(nil, key,groupcache.AllJsonSink(val))
+
+	fmt.Println(l.groupCache.Stats.Gets)
+	fmt.Println(l.groupCache.Stats.CacheHits)
+	fmt.Println(l.groupCache.Stats.PeerLoads)
+	fmt.Println(l.groupCache.Stats.PeerErrors)
+	fmt.Println(l.groupCache.Stats.LocalLoads)
+	fmt.Println(l.groupCache.Stats.LocalLoadErrs)
+	fmt.Println(l.groupCache.Stats.ServerRequests)
 	return err
 }
 

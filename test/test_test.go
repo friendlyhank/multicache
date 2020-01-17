@@ -73,7 +73,7 @@ func TestMultiCache(t *testing.T){
 	for{
 		randTypeId := rand.Intn(15)
 		SwitchGetCache(randTypeId)
-		time.Sleep(3 * time.Second)
+		time.Sleep(time.Duration(randTypeId) * time.Second)
 	}
 }
 
