@@ -3,6 +3,7 @@ package multicache
 import (
 	"fmt"
 	rds "github.com/friendlyhank/multicache/foundation/goredis"
+	pfc "github.com/niean/goperfcounter"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -13,34 +14,6 @@ const (
 	cachePrefix    = "__cache_"
 	cachePrefixLen = len(cachePrefix)
 )
-
-// An AtomicInt is an int64 to be accessed atomically.
-type AtomicInt int64
-
-// Add atomically adds n to i.
-func (i *AtomicInt) Add(n int64) {
-	atomic.AddInt64((*int64)(i), n)
-}
-
-// Get atomically gets the value of i.
-func (i *AtomicInt) Get() int64 {
-	return atomic.LoadInt64((*int64)(i))
-}
-
-func (i *AtomicInt) String() string {
-	return strconv.FormatInt(i.Get(), 10)
-}
-
-// Stats are per-group statistics.
-type Stats struct {
-	Gets           AtomicInt //请求数
-	CacheHits      AtomicInt //本地缓存
-	RedisLoads     AtomicInt //远端缓存
-	RedisLoadErrs AtomicInt  //远端错误
-	LocalLoads     AtomicInt //Db请求
-	LocalLoadErrs  AtomicInt //Db错误
-	ServerRequests AtomicInt //网络请求次数
-}
 
 //MultiCache- 二层缓存
 // 第一层: 基于GroupCache的分布式客户端缓存
@@ -116,6 +89,9 @@ func (m *MultiCache)SetExpired(val interface{}, key string,expired int) error {
 
 //Get-
 func (m *MultiCache)Get(val interface{},args ...interface{})error{
+	allstats.Gets.Add(1)
+	pfc.Gauge("multicache.gets.count", int64(allstats.Gets))
+
 	var err error
 	//开关
 	if m.localCache != nil{
@@ -145,3 +121,42 @@ func MakeMultiCache(name string,redisexpired,localexpired int,cacheBytes int64,g
 
 	return multiCache
 }
+
+
+// An AtomicInt is an int64 to be accessed atomically.
+type AtomicInt int64
+
+// Add atomically adds n to i.
+func (i *AtomicInt) Add(n int64) {
+	atomic.AddInt64((*int64)(i), n)
+}
+
+// Get atomically gets the value of i.
+func (i *AtomicInt) Get() int64 {
+	return atomic.LoadInt64((*int64)(i))
+}
+
+func (i *AtomicInt) String() string {
+	return strconv.FormatInt(i.Get(), 10)
+}
+
+var (
+	allstats = &Stats{}
+)
+
+// Stats are per-group statistics.
+type Stats struct {
+	Gets           AtomicInt //请求数
+	CacheHits      AtomicInt //本地缓存
+	RedisLoads     AtomicInt //远端缓存
+	RedisLoadErrs AtomicInt  //远端错误
+	LocalLoads     AtomicInt //Db请求
+	LocalLoadErrs  AtomicInt //Db错误
+	ServerRequests AtomicInt //网络请求次数
+}
+
+func GetStats()*Stats{
+	return allstats
+}
+
+

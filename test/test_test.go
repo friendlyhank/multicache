@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/friendlyhank/multicache"
 	_ "github.com/friendlyhank/multicache/foundation"
 	"github.com/friendlyhank/multicache/foundation/cache"
 	"github.com/friendlyhank/multicache/foundation/db"
@@ -73,7 +74,9 @@ func TestMultiCache(t *testing.T){
 	for{
 		randTypeId := rand.Intn(15)
 		SwitchGetCache(randTypeId)
-		time.Sleep(time.Duration(randTypeId) * time.Second)
+
+		//time.Sleep(time.Duration(randTypeId) * time.Second)
+		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -117,7 +120,12 @@ func SwitchGetCache(randTypeId int){
 //RandomGetActior -
 func RandomGetActior(){
 	randId := rand.Intn(len(actorids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	actor,err := cache.GetActor(int64(actorids[randId]))
+	timeCost(start,"actor",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get actor|Err|",err.Error())
 	}
@@ -127,7 +135,12 @@ func RandomGetActior(){
 //RandomGetAddress -
 func RandomGetAddress(){
 	randId := rand.Intn(len(addressids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	address,err := cache.GetAddress(int64(addressids[randId]))
+	timeCost(start,"address",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get address|Err|",err.Error())
 	}
@@ -137,7 +150,12 @@ func RandomGetAddress(){
 //RandomGetCategory -
 func RandomGetCategory(){
 	randId := rand.Intn(len(categoryids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	category,err := cache.GetCategory(int64(categoryids[randId]))
+	timeCost(start,"category",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get category|Err|",err.Error())
 	}
@@ -147,7 +165,12 @@ func RandomGetCategory(){
 //RandomGetCity -
 func RandomGetCity(){
 	randId := rand.Intn(len(cityids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	city,err := cache.GetCity(int64(cityids[randId]))
+	timeCost(start,"city",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get city|Err|",err.Error())
 	}
@@ -157,7 +180,12 @@ func RandomGetCity(){
 //RandomGetCountry -
 func RandomGetCountry(){
 	randId := rand.Intn(len(countryids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	country,err := cache.GetCountry(int64(countryids[randId]))
+	timeCost(start,"country",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get country|Err|",err.Error())
 	}
@@ -167,7 +195,12 @@ func RandomGetCountry(){
 //RandomGetCustomer -
 func RandomGetCustomer(){
 	randId := rand.Intn(len(customerids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	customer,err := cache.GetCustomer(int64(customerids[randId]))
+	timeCost(start,"customer",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get customer|Err|",err.Error())
 	}
@@ -177,7 +210,12 @@ func RandomGetCustomer(){
 //RandomGetFilm -
 func RandomGetFilm(){
 	randId := rand.Intn(len(filmids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	film,err := cache.GetFilm(int64(filmids[randId]))
+	timeCost(start,"film",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get film|Err|",err.Error())
 	}
@@ -187,7 +225,12 @@ func RandomGetFilm(){
 //RandomGetFilmActor -
 func RandomGetFilmActor(){
 	randId := rand.Intn(len(fimActorpk)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	filmActor,err := cache.GetFilmActor(int64(fimActorpk[randId].ActorId),int64(fimActorpk[randId].FilmId))
+	timeCost(start,"filmActor",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get filmActor|Err|",err.Error())
 	}
@@ -197,7 +240,12 @@ func RandomGetFilmActor(){
 //RandomGetFilmCategory -
 func RandomGetFilmCategory(){
 	randId := rand.Intn(len(filmcategorypk)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	filmCategory,err := cache.GetFilmCategory(int64(filmcategorypk[randId].FilmId),int64(filmcategorypk[randId].CategoryId))
+	timeCost(start,"filmCategory",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get filmCategory|Err|",err.Error())
 	}
@@ -207,7 +255,12 @@ func RandomGetFilmCategory(){
 //RandomGetFilmText -
 func RandomGetFilmText(){
 	randId := rand.Intn(len(filmtids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	filmText,err := cache.GetFilmText(int64(filmtids[randId]))
+	timeCost(start,"filmText",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get filmText|Err|",err.Error())
 	}
@@ -217,7 +270,12 @@ func RandomGetFilmText(){
 //RandomGetInventory -
 func RandomGetInventory(){
 	randId := rand.Intn(len(inventoryids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	inventory,err := cache.GetInventory(int64(inventoryids[randId]))
+	timeCost(start,"inventory",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get actor|Err|",err.Error())
 	}
@@ -227,7 +285,12 @@ func RandomGetInventory(){
 //RandomGetLanguage -
 func RandomGetLanguage(){
 	randId := rand.Intn(len(languageids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	language,err := cache.GetLanguage(int64(languageids[randId]))
+	timeCost(start,"language",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get actor|Err|",err.Error())
 	}
@@ -237,7 +300,12 @@ func RandomGetLanguage(){
 //RandomGetPayment -
 func RandomGetPayment(){
 	randId := rand.Intn(len(paymentids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	payment,err := cache.GetPayment(int64(paymentids[randId]))
+	timeCost(start,"payment",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get payment|Err|",err.Error())
 	}
@@ -247,7 +315,12 @@ func RandomGetPayment(){
 //RandomGetRental -
 func RandomGetRental(){
 	randId := rand.Intn(len(rentalids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	lental,err := cache.GetRental(int64(rentalids[randId]))
+	timeCost(start,"lental",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get lental|Err|",err.Error())
 	}
@@ -257,7 +330,12 @@ func RandomGetRental(){
 //RandomGetStaff -
 func RandomGetStaff(){
 	randId := rand.Intn(len(staffids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	staff,err := cache.GetStaff(int64(staffids[randId]))
+	timeCost(start,"staff",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get staff|Err|",err.Error())
 	}
@@ -267,11 +345,37 @@ func RandomGetStaff(){
 //RandomGetStore -
 func RandomGetStore(){
 	randId := rand.Intn(len(storeids)-1)
+
+	beginStats := *multicache.GetStats()
+	start := time.Now()
 	store,err := cache.GetStore(int64(storeids[randId]))
+	timeCost(start,"store",beginStats,*multicache.GetStats())
+
 	if err != nil{
 		fmt.Println("get store|Err|",err.Error())
 	}
 	fmt.Println("|get store|",store)
+}
+
+//@brief：耗时统计函数
+func timeCost(start time.Time,dbName string,beginStats multicache.Stats,Endstats multicache.Stats){
+	tc:=time.Since(start)
+	var cacheType string
+	if beginStats.CacheHits != Endstats.CacheHits{
+		cacheType = "local"
+	}
+	if beginStats.RedisLoads != Endstats.RedisLoads{
+		cacheType = "redis"
+	}
+	if beginStats.LocalLoads != Endstats.LocalLoads{
+		cacheType = "db"
+	}
+	if cacheType != ""{
+		fmt.Printf("cache：%v;dbname：%v;time cost = %v\n",cacheType,dbName,tc)
+	}else{
+		fmt.Printf("something worng; time cost = %v\n",tc)
+	}
+
 }
 
 

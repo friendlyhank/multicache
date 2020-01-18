@@ -1,6 +1,10 @@
 package multicache
 
-import rds 	"github.com/friendlyhank/multicache/foundation/goredis"
+import (
+	rds "github.com/friendlyhank/multicache/foundation/goredis"
+	"github.com/gomodule/redigo/redis"
+	pfc "github.com/niean/goperfcounter"
+)
 
 type RedisCache struct{
 	prefix string
@@ -11,12 +15,20 @@ type RedisCache struct{
 
 //Get-
 func (r *RedisCache)Get(val interface{},args ...interface{})error{
+
+	var err error
 	key :=genkey(r.prefix,args...)
 
 	//
-	if _,err:=r.RedisSource.GetJSON(key,val);err == nil{
+	if _,err =r.RedisSource.GetJSON(key,val);err == nil{
 		//找到了
+		allstats.RedisLoads.Add(1)
+		pfc.Gauge("multicache.redisloads.count", int64(allstats.RedisLoads))
 		return nil
+	}
+	if err != nil && err != redis.ErrNil{
+		allstats.RedisLoadErrs.Add(1)
+		pfc.Gauge("multicache.redisloaderrs.count", int64(allstats.RedisLoadErrs))
 	}
 	//
 	if r.getter == nil{
@@ -24,12 +36,16 @@ func (r *RedisCache)Get(val interface{},args ...interface{})error{
 		return nil
 	}
 	if err := r.getter.Get(val,args...);err != nil{
+		allstats.LocalLoadErrs.Add(1)
+		pfc.Gauge("multicache.localloaderrs.count", int64(allstats.LocalLoadErrs))
 		//没有找到
 		return err
 	}
+	allstats.LocalLoads.Add(1)
+	pfc.Gauge("multicache.localloads.count", int64(allstats.LocalLoads))
 
 	//找到了设置到rds
-	err := r.SetExpired(val,key,r.expired)
+	err = r.SetExpired(val,key,r.expired)
 
 	return err
 }

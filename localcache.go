@@ -3,8 +3,8 @@ package multicache
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/friendlyhank/groupcache"
+	pfc "github.com/niean/goperfcounter"
 )
 
 //LocalCache -
@@ -40,13 +40,11 @@ func (l *LocalCache)Get(val interface{}, args ...interface{})error{
 	key := genkey(l.prefix,args...)
 	err := l.groupCache.Get(nil, key,groupcache.AllJsonSink(val))
 
-	fmt.Println(l.groupCache.Stats.Gets)
-	fmt.Println(l.groupCache.Stats.CacheHits)
-	fmt.Println(l.groupCache.Stats.PeerLoads)
-	fmt.Println(l.groupCache.Stats.PeerErrors)
-	fmt.Println(l.groupCache.Stats.LocalLoads)
-	fmt.Println(l.groupCache.Stats.LocalLoadErrs)
-	fmt.Println(l.groupCache.Stats.ServerRequests)
+	//获取groupCache的统计信息
+	groupCacheStats := groupcache.GetAllStats()
+	allstats.CacheHits = AtomicInt(groupCacheStats.CacheHits)
+	pfc.Gauge("multicache.cachehits.count", int64(allstats.CacheHits))
+
 	return err
 }
 
